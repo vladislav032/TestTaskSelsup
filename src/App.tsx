@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 interface Param {
   id: number;
   name: string;
-  type: 'string' | 'number';
+  type: 'string';
 }
 
 interface ParamValue {
@@ -23,6 +23,7 @@ interface Props {
 
 const ParamEditor: React.FC<Props> = ({ params, model }) => {
   const [paramValues, setParamValues] = useState(model.paramValues || []);
+  const [showModal, setShowModal] = useState(false);
 
   const handleChange = (paramId: number, value: string) => {
     setParamValues((prevValues) =>
@@ -32,7 +33,9 @@ const ParamEditor: React.FC<Props> = ({ params, model }) => {
     );
   };
 
-  const getModel = (): Model => ({ paramValues });
+  const getModel = (): Model => {
+    return { paramValues };
+  };
 
   return (
     <div>
@@ -49,7 +52,40 @@ const ParamEditor: React.FC<Props> = ({ params, model }) => {
           </div>
         ))}
       </form>
-      <button onClick={() => console.log(getModel())}>Получить Model</button>
+        <button onClick={() => { console.log(getModel()); setShowModal(true); }}>
+            Показать Model
+        </button>
+
+
+      {showModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center'
+        }}>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '8px' }}>
+            <h3>Модель параметров</h3>
+            <table border={1}>
+              <thead>
+                <tr>
+                  <th>ID параметра</th>
+                  <th>Название</th>
+                  <th>Значение</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paramValues.map(({ paramId, value }) => (
+                  <tr key={paramId}>
+                    <td>{paramId}</td>
+                    <td>{params.find(p => p.id === paramId)?.name || 'Неизвестно'}</td>
+                    <td>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button onClick={() => setShowModal(false)}>Закрыть</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -57,13 +93,12 @@ const ParamEditor: React.FC<Props> = ({ params, model }) => {
 const params: Param[] = [
   { id: 1, name: 'Назначение', type: 'string' },
   { id: 2, name: 'Длина', type: 'string' },
-  { id: 3, name: 'Число', type: 'number' }
 ];
 
 const model: Model = {
   paramValues: [
-    { paramId: 1, value: 'повседневное' },
-    { paramId: 2, value: 'макси' }
+    { paramId: 1, value: 'строка 1' },
+    { paramId: 2, value: 'строка 2' }
   ]
 };
 
